@@ -74,16 +74,6 @@ int main()
         end:
     }
 
-
-    unsigned char first[16] = { 1, 0, 0x38, 0x7f, 0, 0x80, 1, 0 };
-    unsigned char second[16] = { 0xFF, 0xFF, 0xF9, 0xE8, 1, 0, 2, 0 };
-    __asm
-    {
-        movq MM0, qword ptr [first]
-        movq MM2, qword ptr [second]
-        psubsw MM0, MM2
-    }
-
     printf("8086/88: %s\n", is_8086_88 ? "yes" : "no");
     printf("Is CPUID supported: %s\n", is_cpuid_supported ? "yes" : "no");
     printf("Maximum supported number of CPUID parameters: %d\n", cpuid_max);
