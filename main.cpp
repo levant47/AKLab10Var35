@@ -37,37 +37,39 @@ int main()
 
         ; 2. Убедиться в поддержке команды CPUID (посредством бита ID регистра EFLAGS) и определить максимальное значение параметра ее вызова.
         pushfd
-        pop eax
-        mov ebx, eax
-        xor eax, 0x200000
+        pop eax ; загрузить регистр флагов в eax
+        mov ebx, eax ; сохраняем копию текущих значений регистра флагов в ebx
+        xor eax, 0x200000 ; меняем 21-й бит регистра флагов
         push eax
-        popfd
+        popfd ; записываем измененный регистр флагов
         pushfd
-        pop eax
-        cmp eax, ebx
-        jne cpuid_supported_label
+        pop eax ; еще раз загружаем регистр флагов в eax
+        cmp eax, ebx ; проверяем сохранились ли наши изменения в 21-м бите
+        jne cpuid_supported_label ; если сохранились, то данный процессор поддерживает CPUID
 
         cpuid_not_supported_label:
-        mov [is_cpuid_supported], 0
+        mov [is_cpuid_supported], 0 ; процессор НЕ поддерживает CPUID
         jmp end
 
         cpuid_supported_label:
-        mov [is_cpuid_supported], 1
+        mov [is_cpuid_supported], 1 ; процессор поддерживает CPUID
         mov eax, 0
         cpuid
-        mov [cpuid_max], eax
+        mov [cpuid_max], eax ; определяем и сохраняем в память максимальное значение входного параметра CPUID
 
         ; 3. Получить строку идентификации производителя процессора и сохранить ее в памяти.
+        ; строка идентификация была загружена на предыдущем шаге, поэтому сразу сохраняем ее в память
         mov dword ptr [cpuid_string], ebx
         mov dword ptr [cpuid_string + 4], edx
         mov dword ptr [cpuid_string + 8], ecx
 
         ; 4. Получить сигнатуру процессора и определить его модель, семейство и т.п. Выполнить анализ дополнительной информации о процессоре.
         mov eax, 1
-        cpuid
-        mov [cpuid_signature], eax
+        cpuid ; вызываем CPUID с аргументом 1
+        mov [cpuid_signature], eax ; записываем сигнатуру процессора в память
 
         ; 5. Получить флаги свойств. Составить список поддерживаемых процессором свойств.
+        ; используя результаты вызова CPUID на прошлом шаге, сохраняем значения флагов в память
         mov [cpuid_ecx_flags], ecx
         mov [cpuid_edx_flags], edx
 
@@ -83,6 +85,5 @@ int main()
 
     printf("\n");
 }
-
 
 
