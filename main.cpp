@@ -7,6 +7,7 @@ int main()
     bool is_cpuid_supported = false;
     int32_t cpuid_max = 0;
     char cpuid_string[13] = { 0 };
+    int32_t cpuid_additional_info = 0;
     int32_t cpuid_signature = 0;
     int32_t cpuid_ecx_flags = 0;
     int32_t cpuid_edx_flags = 0;
@@ -67,6 +68,7 @@ int main()
         mov eax, 1
         cpuid ; вызываем CPUID с аргументом 1
         mov [cpuid_signature], eax ; записываем сигнатуру процессора в память
+        mov [cpuid_additional_info], ebx ; записываем дополнительную информацию о процессоре
 
         ; 5. Получить флаги свойств. Составить список поддерживаемых процессором свойств.
         ; используя результаты вызова CPUID на прошлом шаге, сохраняем значения флагов в память
@@ -81,6 +83,7 @@ int main()
     printf("Maximum supported number of CPUID parameters: %d\n", cpuid_max);
     printf("CPUID string: %s\n", cpuid_string);
     printf("CPUID signature: %08X\n", cpuid_signature);
+    printf("CPUID additional information: %08X\n", cpuid_additional_info);
     printf("CPUID ECX flags: %08X, EDX flags: %08X\n", cpuid_ecx_flags, cpuid_edx_flags);
 
     printf("\n");
